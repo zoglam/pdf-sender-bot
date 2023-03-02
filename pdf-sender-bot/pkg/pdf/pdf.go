@@ -2,7 +2,6 @@ package pdf
 
 import (
 	"bytes"
-	"fmt"
 	"html/template"
 
 	"github.com/SebastiaanKlippert/go-wkhtmltopdf"
@@ -25,13 +24,11 @@ func (p PDFService) GeneratePDF(data *dto.PDFParams) ([]byte, error) {
 
 	var body bytes.Buffer
 	if err = templ.Execute(&body, data); err != nil {
-		fmt.Println(1, err)
 		return nil, err
 	}
 
 	pdfg, err := wkhtmltopdf.NewPDFGenerator()
 	if err != nil {
-		fmt.Println(2, err)
 		return nil, err
 	}
 
@@ -41,17 +38,16 @@ func (p PDFService) GeneratePDF(data *dto.PDFParams) ([]byte, error) {
 
 	pdfg.AddPage(page)
 
-	pdfg.MarginLeft.Set(0)
 	pdfg.MarginRight.Set(0)
+	pdfg.MarginLeft.Set(0)
 	pdfg.Dpi.Set(300)
 	pdfg.PageSize.Set(wkhtmltopdf.PageSizeA4)
-	pdfg.Orientation.Set(wkhtmltopdf.OrientationLandscape)
+	pdfg.Orientation.Set(wkhtmltopdf.OrientationPortrait)
 
 	err = pdfg.Create()
 	if err != nil {
-		fmt.Println(3, err)
 		return nil, err
 	}
-
+	
 	return pdfg.Bytes(), nil
 }

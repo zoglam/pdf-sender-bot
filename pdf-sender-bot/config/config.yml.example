@@ -1,0 +1,6 @@
+db:
+  dsn: "postgres://postgres:1234@127.0.0.1:5432/comm"
+server:
+  port: "8000"
+telegram:
+  token: "xxxx"
