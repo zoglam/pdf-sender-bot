@@ -1,0 +1,70 @@
+version: '3.9'
+
+x-limits:
+  medium:
+    resources: &limits_medium
+      limits:
+        cpus: '0.64'
+        memory: 128M
+      reservations:
+        cpus: '0.32'
+        memory: 32M
+  small:
+    resources: &limits_small
+      limits:
+        cpus: '0.32'
+        memory: 64M
+      reservations:
+        cpus: '0.16'
+        memory: 32M
+
+services:
+
+  # pdf-sender-bot:
+  #   container_name: pdf-sender-bot
+  #   restart: unless-stopped
+  #   build:
+  #     context: .
+  #   networks:
+  #     - backend
+  #   deploy:
+  #     resources: *limits_small
+
+  # postgres:
+  #   container_name: postgres
+  #   restart: unless-stopped
+  #   image: postgres:15.1
+  #   volumes:
+  #     - postgres:/var/lib/postgresql/data
+  #   env_file:
+  #     - ./configs/.env
+  #   networks:
+  #     - backend
+  #   deploy:
+  #     resources: *limits_medium
+
+  nginx:
+    image: nginx:1.23.3
+    restart: unless-stopped
+    container_name: nginx
+    volumes:
+      - ./infra/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./infra/ca.crt:/etc/nginx/ca.crt:ro
+      - ./infra/ca.key:/etc/nginx/ca.key:ro
+    ports:
+    - "0.0.0.0:8000:8000"
+    - "0.0.0.0:5432:5432"
+    # depends_on:
+    #   - pdf-sender-bot
+      # - postgres
+    network_mode: bridge
+    deploy:
+      resources: *limits_medium
+
+networks:
+  backend:
+
+volumes:
+  postgres:
+    name: postgres
+    driver: local
