@@ -1,0 +1,54 @@
+
+#root {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+#container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 0 16px;
+  min-height: var(--tg-viewport-stable-height);
+  width: 100%;
+}
+
+input:focus{
+  outline: none;
+}
+
+.theme-bg-color {
+  background-color: var(--tg-theme-bg-color)
+}
+
+.theme-button-color {
+  background-color: var(--tg-theme-button-color)
+}
+
+.theme-button-text-color {
+  color: var(--tg-theme-button-text-color)
+}
+
+.theme-hint-color {
+  color: var(--tg-theme-hint-color)
+}
+
+.theme-link-color {
+  color: var(--tg-theme-link-color)
+}
+
+.theme-secondary-bg-color {
+  background-color: var(--tg-theme-secondary-bg-color)
+}
+
+.theme-text-color {
+  color: var(--tg-theme-text-color)
+}
+
+.theme-button-border-color {
+  border-color: var(--tg-theme-hint-color);
+}
