@@ -6,7 +6,6 @@ import LocationProvider from "./provider/location"
 
 import Profile from './pages/profile'
 import Main from './pages/main'
-import { LoginFormFields } from "./types/profile";
 
 function App() {
 

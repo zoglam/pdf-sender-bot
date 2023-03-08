@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
+	"github.com/VictoriaMetrics/metrics"
 	"github.com/gorilla/mux"
 	"github.com/spf13/viper"
 	"github.com/zoglam/pdf-sender-bot/internal/app"
@@ -19,8 +21,7 @@ import (
 )
 
 func main() {
-
-	// ctx := context.Background()
+	ctx := context.Background()
 
 	go func() {
 		ch := make(chan os.Signal, 1)
@@ -43,22 +44,23 @@ func main() {
 	serverHost := viper.Get("server.port").(string)
 	telegramToken := viper.Get("telegram.token").(string)
 	telegramWebAppURL := viper.Get("telegram.webappurl").(string)
-	// dsn := viper.Get("db.dsn").(string)
+	dsn := viper.Get("db.dsn").(string)
 
-	// db, err := repository.NewDB(ctx, dsn)
-	// if err != nil {
-	// 	logg.Fatal().Msgf("cannot connect db: %v", err)
-	// }
-	// err = db.Ping(ctx)
-	// if err != nil {
-	// 	logg.Fatal().Msgf("cannot ping db: %v", err)
-	// }
-	// defer db.Close()
+	db, err := repository.NewDB(ctx, dsn)
+	if err != nil {
+		logg.Fatal().Msgf("cannot connect db: %v", err)
+	}
+	err = db.Ping(ctx)
+	if err != nil {
+		logg.Fatal().Msgf("cannot ping db: %v", err)
+	}
+	defer db.Close()
 
 	dao := repository.NewDAO()
 	bot := telegram.InitBot(telegramToken)
 	userService := service.NewUserService(dao)
 	pdfService := service.NewPDFService()
+
 	rest := rest.NewRest(
 		pdfService,
 		userService,
@@ -78,10 +80,19 @@ func main() {
 	defer bot.Bot.Close()
 
 	r := mux.NewRouter()
+
 	api := r.PathPrefix("/api").Subrouter()
-	api.HandleFunc("/profile", rest.GetPDF).Methods("POST")
+	api.Use(rest.Middleware)
+	api.HandleFunc("/profile", rest.PostProfile).Methods("POST")
+	api.HandleFunc("/profile", rest.GetProfile).Methods("GET")
+
 	private := r.PathPrefix("/private").Subrouter()
+	private.Use(rest.Middleware)
 	private.HandleFunc("/getpdf", rest.GetPDF).Methods("GET")
+
+	r.HandleFunc("/metrics", func(w http.ResponseWriter, _ *http.Request) {
+		metrics.WritePrometheus(w, true)
+	}).Methods("GET")
 
 	srv := &http.Server{
 		Handler:      r,

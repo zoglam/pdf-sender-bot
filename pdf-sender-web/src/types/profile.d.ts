@@ -1,14 +1,15 @@
-export type LoginFormFields = {
+export type UserFields = {
+  UserID: BigInteger
+  FirstName: string
+  SecondName: string
+  ThirdName: string
   Organization: string
   Address: string
   Phone: string
   OGRN: string
-  ModelT: string
-  GovermentSign: string
-  SecondName: string
-  FirstName: string
-  ThirdName: string
-  СertificateNumber: string
+  VehicleModel: string
+  StateLicensePlate: string
+  IDNumber: string
   LicenseRegistrationNumber: string
   LicenseSerial: string
   LicenseNumber: string

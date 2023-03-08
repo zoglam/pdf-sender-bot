@@ -18,47 +18,64 @@ type userQuery struct{}
 const (
 	InsertUserDataSQL = `
 	insert into users values(
-		@user_id
-		@firstName
-		@secondName
-		@thirdName
-		@organization
-		@address
-		@phone
-		@OGRN
-		@vehicleModel
-		@stateLicensePlate
-		@IDNumber
-		@licenseRegistrationNumber
-		@licenseSerial
-		@licenseNumber
-		@garageNumber
+		@user_id,
+		@firstName,
+		@secondName,
+		@thirdName,
+		@organization,
+		@address,
+		@phone,
+		@OGRN,
+		@vehicleModel,
+		@stateLicensePlate,
+		@IDNumber,
+		@licenseRegistrationNumber,
+		@licenseSerial,
+		@licenseNumber,
+		@garageNumber,
 		@personnelNumber
 	)
 	`
 
 	UpdateUserDataSQL = `
 	update users set
-		firstName=@firstName
-		secondName=@secondName
-		thirdName=@thirdName
-		organization=@organization
-		address=@address
-		phone=@phone
-		OGRN=@OGRN
-		vehicleModel=@vehicleModel
-		stateLicensePlate=@stateLicensePlate
-		IDNumber=@IDNumber
-		licenseRegistrationNumber=@licenseRegistrationNumber
-		licenseSerial=@licenseSerial
-		licenseNumber=@licenseNumber
-		garageNumber=@garageNumber
+		firstName=@firstName,
+		secondName=@secondName,
+		thirdName=@thirdName,
+		organization=@organization,
+		address=@address,
+		phone=@phone,
+		OGRN=@OGRN,
+		vehicleModel=@vehicleModel,
+		stateLicensePlate=@stateLicensePlate,
+		IDNumber=@IDNumber,
+		licenseRegistrationNumber=@licenseRegistrationNumber,
+		licenseSerial=@licenseSerial,
+		licenseNumber=@licenseNumber,
+		garageNumber=@garageNumber,
 		personnelNumber=@personnelNumber
 	where user_id=@user_id
 	`
 
 	GetUserDataSQL = `
-	select * from users 
+	select
+		user_id,
+		firstName,
+		secondName,
+		thirdName,
+		organization,
+		address,
+		phone,
+		OGRN,
+		vehicleModel,
+		stateLicensePlate,
+		IDNumber,
+		licenseRegistrationNumber,
+		licenseSerial,
+		licenseNumber,
+		garageNumber,
+		personnelNumber
+	from users
 	where user_id=$1
 	`
 )
@@ -84,10 +101,12 @@ func (u *userQuery) InsertUserData(data *dto.User) error {
 		"garageNumber":              data.GarageNumber,
 		"personnelNumber":           data.PersonnelNumber,
 	}
+
 	_, err := DB.Exec(ctx, InsertUserDataSQL, args)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 func (u *userQuery) UpdateUserData(data *dto.User) error {
@@ -120,11 +139,31 @@ func (u *userQuery) UpdateUserData(data *dto.User) error {
 func (u *userQuery) GetUserData(id int64) (*dto.User, error) {
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "query-name", "GetUserData")
+
 	rows := DB.QueryRow(ctx, GetUserDataSQL, id)
-	user := &dto.User{}
-	err := rows.Scan(user)
-	if err != nil {
+
+	var user dto.User
+	err := rows.Scan(
+		&user.UserID,
+		&user.FirstName,
+		&user.SecondName,
+		&user.ThirdName,
+		&user.Organization,
+		&user.Address,
+		&user.Phone,
+		&user.OGRN,
+		&user.VehicleModel,
+		&user.StateLicensePlate,
+		&user.IDNumber,
+		&user.LicenseRegistrationNumber,
+		&user.LicenseSerial,
+		&user.LicenseNumber,
+		&user.GarageNumber,
+		&user.PersonnelNumber,
+	)
+	if err != nil && err != pgx.ErrNoRows {
 		return nil, err
 	}
-	return user, nil
+
+	return &user, nil
 }

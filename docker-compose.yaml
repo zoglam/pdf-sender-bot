@@ -30,18 +30,20 @@ services:
   #   deploy:
   #     resources: *limits_small
 
-  # postgres:
-  #   container_name: postgres
-  #   restart: unless-stopped
-  #   image: postgres:15.1
-  #   volumes:
-  #     - postgres:/var/lib/postgresql/data
-  #   env_file:
-  #     - ./configs/.env
-  #   networks:
-  #     - backend
-  #   deploy:
-  #     resources: *limits_medium
+  postgres:
+    container_name: postgres
+    restart: unless-stopped
+    image: postgres:15.1
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    env_file:
+      - ./infra/.env
+    ports:
+      - 5432:5432
+    networks:
+      - backend
+    deploy:
+      resources: *limits_medium
 
   nginx:
     image: nginx:1.23.3
@@ -53,7 +55,7 @@ services:
       - ./infra/ca.key:/etc/nginx/ca.key:ro
     ports:
     - "0.0.0.0:8000:8000"
-    - "0.0.0.0:5432:5432"
+    - "0.0.0.0:6432:5432"
     # depends_on:
     #   - pdf-sender-bot
       # - postgres

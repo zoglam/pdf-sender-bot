@@ -5,12 +5,14 @@ import (
 
 	"github.com/zoglam/pdf-sender-bot/internal/dto"
 	"github.com/zoglam/pdf-sender-bot/internal/repository"
+	"github.com/zoglam/pdf-sender-bot/pkg/logg"
 )
 
 type UserService interface {
 	GetUserProfile(id int64) (*dto.User, error)
 	SaveUserProfile(id int64, data *dto.User) error
 	DidUserRegistrated(id int64) (bool, error)
+	DidUserFilledData(id int64) (bool, error)
 }
 
 type userService struct {
@@ -32,6 +34,7 @@ func (u *userService) GetUserProfile(id int64) (*dto.User, error) {
 	}
 	return user, err
 }
+
 func (u *userService) SaveUserProfile(id int64, data *dto.User) error {
 	hasRegistration, err := u.DidUserRegistrated(id)
 	if err != nil {
@@ -39,17 +42,22 @@ func (u *userService) SaveUserProfile(id int64, data *dto.User) error {
 	}
 
 	if hasRegistration {
+		logg.Info().Msgf("%+v, %s %+v", hasRegistration, "UpdateUserData", data)
 		err := u.dao.NewUserQuery().UpdateUserData(data)
 		if err != nil {
 			return err
 		}
 	} else {
+		logg.Info().Msgf("%+v, %s %+v", hasRegistration, "InsertUserData", data)
 		err := u.dao.NewUserQuery().InsertUserData(data)
 		if err != nil {
 			return err
 		}
 	}
+
+	return nil
 }
+
 func (u *userService) DidUserRegistrated(id int64) (bool, error) {
 	data, err := u.GetUserProfile(id)
 	if err != nil {
@@ -60,7 +68,21 @@ func (u *userService) DidUserRegistrated(id int64) (bool, error) {
 		return false, err
 	}
 
-	v := reflect.ValueOf(data)
+	return true, nil
+
+}
+
+func (u *userService) DidUserFilledData(id int64) (bool, error) {
+	data, err := u.GetUserProfile(id)
+	if err != nil {
+		return false, err
+	}
+
+	if *data == (dto.User{}) {
+		return false, err
+	}
+
+	v := reflect.ValueOf(*data)
 	if v.Kind() != reflect.Struct {
 		return false, nil
 	}

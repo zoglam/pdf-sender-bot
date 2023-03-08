@@ -1,14 +1,13 @@
-
+import React from "react"
 import { useNavigate } from "react-router-dom"
 import { useEffect } from "react"
 
 function Main() {
   const navigate = useNavigate()
 
-
   useEffect(() => {
-    window.Telegram.WebApp.BackButton.hide()
     window.Telegram.WebApp.MainButton.hide()
+    window.Telegram.WebApp.BackButton.hide()
   })
 
   return (

@@ -1,20 +1,20 @@
 package dto
 
 type User struct {
-	UserID                    int64  // id в телеграм
-	FirstName                 string // Имя
-	SecondName                string // Фамилия
-	ThirdName                 string // Отчество
-	Organization              string // Организация
-	Address                   string // Адрес
-	Phone                     string // Телефон
-	OGRN                      string // ОРГН / ОРГНИП
-	VehicleModel              string // Модель ТС
-	StateLicensePlate         string // Государственный номерной знак
-	IDNumber                  string // Удостоверение №
-	LicenseRegistrationNumber string // Лицензия # Регистрационный №
-	LicenseSerial             string // Лицензия # Серия
-	LicenseNumber             string // Лицензия # Номер
-	GarageNumber              string // Гаражный номер
-	PersonnelNumber           string // Табельный номер
+	UserID                    int64  `db:"user_id"`                   // id в телеграм
+	FirstName                 string `db:"firstName"`                 // Имя
+	SecondName                string `db:"secondName"`                // Фамилия
+	ThirdName                 string `db:"thirdName"`                 // Отчество
+	Organization              string `db:"organization"`              // Организация
+	Address                   string `db:"address"`                   // Адрес
+	Phone                     string `db:"phone"`                     // Телефон
+	OGRN                      string `db:"OGRN"`                      // ОРГН / ОРГНИП
+	VehicleModel              string `db:"vehicleModel"`              // Модель ТС
+	StateLicensePlate         string `db:"stateLicensePlate"`         // Государственный номерной знак
+	IDNumber                  string `db:"IDNumber"`                  // Удостоверение №
+	LicenseRegistrationNumber string `db:"licenseRegistrationNumber"` // Лицензия # Регистрационный №
+	LicenseSerial             string `db:"licenseSerial"`             // Лицензия # Серия
+	LicenseNumber             string `db:"licenseNumber"`             // Лицензия # Номер
+	GarageNumber              string `db:"garageNumber"`              // Гаражный номер
+	PersonnelNumber           string `db:"personnelNumber"`           // Табельный номер
 }

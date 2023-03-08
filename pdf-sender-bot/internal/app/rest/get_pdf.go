@@ -5,6 +5,7 @@ import (
 
 	"github.com/zoglam/pdf-sender-bot/internal/dto"
 	"github.com/zoglam/pdf-sender-bot/pkg/logg"
+	"github.com/zoglam/pdf-sender-bot/pkg/metrics"
 )
 
 func (a *Rest) GetPDF(w http.ResponseWriter, r *http.Request) {
@@ -32,6 +33,7 @@ func (a *Rest) GetPDF(w http.ResponseWriter, r *http.Request) {
 	pdfBytes, err := a.PDFService.GeneratePDF(data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		metrics.RestMetrics.Counter(r.URL.Path, http.StatusBadRequest).Inc()
 		return
 	}
 
@@ -39,4 +41,6 @@ func (a *Rest) GetPDF(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/pdf")
 	w.WriteHeader(http.StatusOK)
 	w.Write(pdfBytes)
+
+	metrics.RestMetrics.Counter(r.URL.Path, http.StatusOK).Inc()
 }

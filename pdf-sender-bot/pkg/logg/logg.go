@@ -2,42 +2,61 @@ package logg
 
 import (
 	"context"
+	"os"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
-func parseRequestID(ctx ...context.Context) string {
+type IDs struct {
+	requestID  string
+	telegramID string
+}
+
+func parseIDs(ctx ...context.Context) *IDs {
+
+	ids := &IDs{}
+
 	if len(ctx) != 1 {
-		return ""
+		return ids
 	}
-	requestID := ctx[0].Value("x-telegram-id")
-	if requestID == nil {
-		return ""
+
+	telegramID := ctx[0].Value("x-telegram-id")
+	if telegramID != nil {
+		ids.telegramID = telegramID.(string)
 	}
-	return requestID.(string)
+
+	requestID := ctx[0].Value("x-request-id")
+	if requestID != nil {
+		ids.requestID = requestID.(string)
+	}
+
+	return ids
+}
+
+func fillIDs(logger *zerolog.Event, ctx ...context.Context) *zerolog.Event {
+	ids := parseIDs(ctx...)
+
+	if ids.telegramID != "" {
+		logger = logger.Any("x-telegram-id", ids.telegramID)
+	}
+
+	if ids.requestID != "" {
+		logger = logger.Any("x-request-id", ids.requestID)
+	}
+	return logger
 }
 
 func Info(ctx ...context.Context) *zerolog.Event {
-	requestID := parseRequestID(ctx...)
-	if requestID != "" {
-		return log.Info().Any("x-telegram-id", requestID)
-	}
-	return log.Info()
+	return fillIDs(log.Info(), ctx...)
 }
 
 func Fatal(ctx ...context.Context) *zerolog.Event {
-	requestID := parseRequestID(ctx...)
-	if requestID != "" {
-		return log.Fatal().Any("x-chat-id", requestID)
-	}
-	return log.Fatal()
+	logger := zerolog.New(os.Stdout).With().Timestamp().Caller().Stack().Logger()
+	return fillIDs(logger.Fatal(), ctx...)
 }
 
 func Error(ctx ...context.Context) *zerolog.Event {
-	requestID := parseRequestID(ctx...)
-	if requestID != "" {
-		return log.Error().Any("x-chat-id", requestID)
-	}
-	return log.Error()
+	logger := zerolog.New(os.Stdout).With().Timestamp().Caller().Stack().Logger()
+	return fillIDs(logger.Error(), ctx...)
 }

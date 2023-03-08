@@ -28,6 +28,9 @@ input:focus{
 .theme-button-color {
   background-color: var(--tg-theme-button-color)
 }
+.theme-color-fill {
+  fill: var(--tg-theme-button-color)
+}
 
 .theme-button-text-color {
   color: var(--tg-theme-button-text-color)
