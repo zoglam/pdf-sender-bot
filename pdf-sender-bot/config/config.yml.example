@@ -4,3 +4,4 @@ server:
   port: "8000"
 telegram:
   token: "xxxx"
+  webappurl: "https://url"
