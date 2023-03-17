@@ -5,7 +5,7 @@ WORKDIR /opt
 COPY . .
 RUN make build
 
-FROM debian:11.6-slim
+FROM ubuntu:jammy
 RUN apt update -y && apt install wkhtmltopdf -y && rm -rf /var/lib/{apt,dpkg}/*
 RUN adduser --disabled-password --gecos '' bot
 COPY --from=builder --chown=bot /opt/bin/app /opt/app
